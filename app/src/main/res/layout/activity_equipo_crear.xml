@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+        </android.support.design.widget.AppBarLayout>
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="30dp"
+            android:text="Nombre:"
+            android:textStyle="bold" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input1"
+            android:textColorHint="@color/black2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            app:errorTextAppearance="@style/ErrorStyle">
+
+            <EditText
+                android:id="@+id/editTexto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Nombre del equipo..."
+                android:textColorHint="@color/black2"
+                android:inputType="textCapWords" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:id="@+id/escudo_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:text="Escudo:"
+            android:textStyle="bold" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/escudo_img"
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="198dp"
+                android:src="@drawable/escudo"
+                android:layout_weight="0.4"/>
+
+            <LinearLayout
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.6"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <Button
+                    android:id="@+id/boton_camara"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/boton"
+                    android:text="Camara"
+                    android:textColor="@color/white" />
+
+                <Button
+                    android:id="@+id/boton_galeria"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/boton"
+                    android:text="Galería"
+                    android:textColor="@color/white" />
+
+                <Button
+                    android:id="@+id/boton_limpiar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/boton"
+                    android:text="Limpiar"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp">
+
+            <Button
+                android:id="@+id/boton_crear"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/boton"
+                android:gravity="center"
+                android:text="Crear"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+</ScrollView>

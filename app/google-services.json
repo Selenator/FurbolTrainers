@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "729432749204",
+    "firebase_url": "https://furbol-trainers.firebaseio.com",
+    "project_id": "furbol-trainers",
+    "storage_bucket": "furbol-trainers.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:729432749204:android:7c9da3d96a7d42f8",
+        "android_client_info": {
+          "package_name": "com.oveigam.furboltrainers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "729432749204-92sjlrb4s2895o2vk1cadduverc064lp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.oveigam.furboltrainers",
+            "certificate_hash": "6dfb1d8881a57e2720b8c2137c2417c675c00cd9"
+          }
+        },
+        {
+          "client_id": "729432749204-1vo0e2ms704ucn3uejq2gfs1armtkmb9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBS3R2TY4p1RGkorMbaUeCGHn9bU1TRYiA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "729432749204-1vo0e2ms704ucn3uejq2gfs1armtkmb9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
