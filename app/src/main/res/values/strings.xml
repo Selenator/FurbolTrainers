@@ -10,4 +10,5 @@
 
     <string name="jugador_tab">Jugador</string>
     <string name="equipo_tab">Equipo</string>
+    <string name="title_activity_equipo">EquipoActivity</string>
 </resources>

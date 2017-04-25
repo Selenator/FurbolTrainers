@@ -8,16 +8,27 @@ import java.util.HashMap;
  * Created by Oscarina on 18/04/2017.
  */
 public class Equipo {
-    String nombre;
-    String imgURL;
-    HashMap<String,Jugador> jugadores;
+    private String id;
+    private String nombre;
+    private String imgURL;
+    private HashMap<String,Jugador> jugadores;
 
     public Equipo() {
     }
 
-    public Equipo(String nombre, String imgURL) {
+    public Equipo(String id, String nombre, String imgURL) {
+        this.id = id;
         this.nombre = nombre;
         this.imgURL = imgURL;
+    }
+
+    @Exclude
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getNombre() {

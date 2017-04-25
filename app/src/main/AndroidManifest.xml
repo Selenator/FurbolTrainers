@@ -27,6 +27,10 @@
         <activity
             android:name=".activities.EquipoCrearActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.EquipoActivity"
+            android:label="@string/title_activity_equipo"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package com.oveigam.furboltrainers.fragments;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -42,8 +43,8 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         adapter = new EventoAdapter(getContext());
 
-        View rootView = inflater.inflate(R.layout.fragment_eventos, container, false);
-        ListView listView = (ListView) rootView.findViewById(R.id.lista_eventos);
+        View rootView = inflater.inflate(R.layout.fragment_con_lista, container, false);
+        ListView listView = (ListView) rootView.findViewById(R.id.lista);
         listView.setAdapter(adapter);
         listView.setEmptyView(rootView.findViewById(android.R.id.empty));
 
@@ -55,7 +56,7 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
         });
 
 
-        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_eventos);
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh);
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.post(new Runnable() {
                                     @Override
@@ -124,7 +125,8 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     });
                     adapter.notifyDataSetChanged();
                 } else {
-                    System.out.println("NO HAY EQUIPOS PARA ESTE JUGADOR");
+                    Snackbar.make(getView(), "No tienes ningun evento previsto.", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 }
                 swipeRefreshLayout.setRefreshing(false);
             }
