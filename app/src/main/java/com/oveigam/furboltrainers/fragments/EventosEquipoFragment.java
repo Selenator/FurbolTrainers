@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,6 +34,7 @@ public class EventosEquipoFragment extends Fragment implements SwipeRefreshLayou
 
     private EventoAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private TextView emptyText;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -41,6 +43,9 @@ public class EventosEquipoFragment extends Fragment implements SwipeRefreshLayou
         equipoID = getActivity().getIntent().getStringExtra("equipoID");
 
         View rootView = inflater.inflate(R.layout.fragment_con_lista, container, false);
+
+        emptyText = (TextView) rootView.findViewById(R.id.empty);
+        emptyText.setVisibility(View.INVISIBLE);
 
         ListView listView = (ListView) rootView.findViewById(R.id.lista);
         listView.setAdapter(adapter);
@@ -71,20 +76,20 @@ public class EventosEquipoFragment extends Fragment implements SwipeRefreshLayou
     @Override
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
-
+        emptyText.setVisibility(View.INVISIBLE);
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 adapter.clear();
 
+                String nombreEquipo = dataSnapshot.child("equipos").child(equipoID).child("nombre").getValue(String.class);
+                String imgEquipo = dataSnapshot.child("equipos").child(equipoID).child("imgURL").getValue(String.class);
 
                 GenericTypeIndicator<Map<String, Boolean>> t = new GenericTypeIndicator<Map<String, Boolean>>() {
                 };
 
                 Map<String, Boolean> eventosID = dataSnapshot.child("equipos").child(equipoID).child("eventos").getValue(t);
                 if(eventosID!=null){
-                    String nombreEquipo = dataSnapshot.child("equipos").child(equipoID).child("nombre").getValue(String.class);
-                    String imgEquipo = dataSnapshot.child("equipos").child(equipoID).child("imgURL").getValue(String.class);
                     for(String id : eventosID.keySet()){
                         Evento evento = dataSnapshot.child("eventos").child(id).getValue(Evento.class);
                         if(evento!=null){
@@ -96,8 +101,7 @@ public class EventosEquipoFragment extends Fragment implements SwipeRefreshLayou
                         }
                     }
                 }else {
-                    Snackbar.make(getView(), "Este equipo no tiene ningun evento previsto.", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    emptyText.setVisibility(View.VISIBLE);
                 }
                 adapter.sort(new Comparator<Evento>() {
                     @Override

@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -38,6 +39,7 @@ public class EquiposFragment extends Fragment implements SwipeRefreshLayout.OnRe
     EquipoAdapter adapter;
 
     SwipeRefreshLayout swipeRefreshLayout;
+    private TextView emptyText;
 
 
     @Override
@@ -45,6 +47,10 @@ public class EquiposFragment extends Fragment implements SwipeRefreshLayout.OnRe
         adapter = new EquipoAdapter(getContext(), new ArrayList<Equipo>());
 
         View rootView = inflater.inflate(R.layout.fragment_con_lista, container, false);
+
+        emptyText = (TextView) rootView.findViewById(R.id.empty);
+        emptyText.setVisibility(View.INVISIBLE);
+
         final ListView listView = (ListView) rootView.findViewById(R.id.lista);
         listView.setAdapter(adapter);
         listView.setEmptyView(rootView.findViewById(android.R.id.empty));
@@ -61,13 +67,6 @@ public class EquiposFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh);
         swipeRefreshLayout.setOnRefreshListener(this);
-//        swipeRefreshLayout.post(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        onRefresh();
-//                                    }
-//                                }
-//        );
 
 
         return rootView;
@@ -76,6 +75,7 @@ public class EquiposFragment extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
+        emptyText.setVisibility(View.INVISIBLE);
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -103,8 +103,7 @@ public class EquiposFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     });
                     adapter.notifyDataSetChanged();
                 } else {
-                    Snackbar.make(getView(), "Todavía no perteneces a ningun equipo.", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    emptyText.setVisibility(View.VISIBLE);
                 }
                 swipeRefreshLayout.setRefreshing(false);
             }

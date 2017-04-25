@@ -2,6 +2,8 @@ package com.oveigam.furboltrainers.entities;
 
 import android.net.Uri;
 
+import com.google.firebase.database.Exclude;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -11,6 +13,7 @@ import java.util.HashMap;
 public class Jugador {
     private String nombre;
     private String imgURL;
+    private boolean entrenador;
     HashMap<String,Boolean> equipos;
 
     public Jugador(String nombre) {
@@ -39,6 +42,15 @@ public class Jugador {
 
     public void setImgURL(String imgURL) {
         this.imgURL = imgURL;
+    }
+
+    @Exclude
+    public boolean isEntrenador() {
+        return entrenador;
+    }
+
+    public void setEntrenador(boolean entrenador) {
+        this.entrenador = entrenador;
     }
 
     public HashMap<String, Boolean> getEquipos() {

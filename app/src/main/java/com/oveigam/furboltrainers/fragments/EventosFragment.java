@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -38,12 +39,17 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
     EventoAdapter adapter;
 
     SwipeRefreshLayout swipeRefreshLayout;
+    private TextView emptyText;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         adapter = new EventoAdapter(getContext());
 
         View rootView = inflater.inflate(R.layout.fragment_con_lista, container, false);
+
+        emptyText = (TextView) rootView.findViewById(R.id.empty);
+        emptyText.setVisibility(View.INVISIBLE);
+
         ListView listView = (ListView) rootView.findViewById(R.id.lista);
         listView.setAdapter(adapter);
         listView.setEmptyView(rootView.findViewById(android.R.id.empty));
@@ -80,12 +86,7 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
-//        for(int i = 0; i<adapter.getCount(); i++){
-//            myRef.child("eventos").push().setValue(adapter.getItem(i));
-//
-//        }
-//        swipeRefreshLayout.setRefreshing(false);
-
+        emptyText.setVisibility(View.INVISIBLE);
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -125,8 +126,7 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     });
                     adapter.notifyDataSetChanged();
                 } else {
-                    Snackbar.make(getView(), "No tienes ningun evento previsto.", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    emptyText.setVisibility(View.VISIBLE);
                 }
                 swipeRefreshLayout.setRefreshing(false);
             }
