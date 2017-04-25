@@ -6,6 +6,7 @@
     android:orientation="horizontal">
 
     <ImageView
+        android:padding="5dp"
         android:id="@+id/escudo_img"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

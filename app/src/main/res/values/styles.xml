@@ -17,6 +17,9 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="HintGrey">
+        <item name="android:textColor">@color/black2</item>
+    </style>
 
     <style name="ErrorStyle">
         <item name="android:textColor">@color/redError</item>

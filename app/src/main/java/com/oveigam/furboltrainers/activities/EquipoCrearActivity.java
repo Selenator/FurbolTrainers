@@ -7,7 +7,9 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,11 +20,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.oveigam.furboltrainers.R;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.IOException;
 
@@ -42,6 +50,8 @@ public class EquipoCrearActivity extends AppCompatActivity {
     private static final int OPEN_REQUEST_CODE = 41;
     private static final int CAMERA_REQUEST = 1888;
 
+    boolean subirIMG;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +68,7 @@ public class EquipoCrearActivity extends AppCompatActivity {
         limpiar = (Button) findViewById(R.id.boton_limpiar);
 
         nombre = (EditText) findViewById(R.id.editTexto);
-        final TextInputLayout inputL = (TextInputLayout) findViewById(R.id.input1);
+//        final TextInputLayout inputL = (TextInputLayout) findViewById(R.id.input1);
 
         escudo = (ImageView) findViewById(R.id.escudo_img);
 
@@ -66,14 +76,10 @@ public class EquipoCrearActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (nombre.getText() != null && !nombre.getText().toString().trim().isEmpty()) {
-                    String key = myRef.child("equipos").push().getKey();
-                    myRef.child("equipos").child(key).child("nombre").setValue(nombre.getText().toString());
-                    myRef.child("equipos").child(key).child("jugadores").child(userID).setValue(true);
-                    myRef.child("jugadores").child(userID).child("equipos").child(key).setValue(true);
-                    Toast.makeText(getBaseContext(), "EXITO", Toast.LENGTH_LONG).show();
-                    finish();
+                    crearEquipo();
                 } else {
-                    inputL.setError("Te has olvidado de algo!");
+                    Snackbar.make(v, "Creo que te olvidas del nombre!", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 }
             }
         });
@@ -84,6 +90,7 @@ public class EquipoCrearActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
+                subirIMG = true;
             }
         });
 
@@ -94,6 +101,7 @@ public class EquipoCrearActivity extends AppCompatActivity {
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("image/*");
                 startActivityForResult(intent, OPEN_REQUEST_CODE);
+                subirIMG = true;
             }
         });
 
@@ -101,10 +109,66 @@ public class EquipoCrearActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 escudo.setImageResource(R.drawable.escudo);
+                subirIMG = false;
             }
         });
 
 
+    }
+
+    private void crearEquipo() {
+        final String key = myRef.child("equipos").push().getKey();
+
+
+        if(subirIMG){
+            crearConImagen(key);
+        }
+        else{
+            crearSinImagen(key);
+        }
+
+
+    }
+
+    private void crearSinImagen(String key) {
+        myRef.child("equipos").child(key).child("nombre").setValue(nombre.getText().toString());
+        myRef.child("equipos").child(key).child("jugadores").child(userID).setValue(true);
+        myRef.child("jugadores").child(userID).child("equipos").child(key).setValue(true);
+        Toast.makeText(getBaseContext(), "EXITO", Toast.LENGTH_LONG).show();
+        finish();
+    }
+
+    private void crearConImagen(final String key) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReferenceFromUrl("gs://furbol-trainers.appspot.com");
+        StorageReference imagesRef = storageRef.child("escudos").child(key+".png");
+        escudo.setDrawingCacheEnabled(true);
+        escudo.buildDrawingCache();
+        Bitmap bitmap = escudo.getDrawingCache();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        UploadTask uploadTask = imagesRef.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+                Toast.makeText(getBaseContext(),"ALGO SALIO MAL",Toast.LENGTH_LONG).show();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                myRef.child("equipos").child(key).child("nombre").setValue(nombre.getText().toString());
+                myRef.child("equipos").child(key).child("imgURL").setValue(downloadUrl.toString());
+                myRef.child("equipos").child(key).child("jugadores").child(userID).setValue(true);
+                myRef.child("jugadores").child(userID).child("equipos").child(key).setValue(true);
+                Toast.makeText(getBaseContext(), "EXITO", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
     }
 
     @Override

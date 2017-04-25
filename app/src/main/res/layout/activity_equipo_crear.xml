@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:orientation="vertical">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -35,29 +37,33 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="30dp"
             android:text="Nombre:"
+            android:textColor="@color/colorPrimary"
             android:textStyle="bold" />
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/input1"
-            android:textColorHint="@color/black2"
+        <!--  <android.support.design.widget.TextInputLayout
+              android:id="@+id/input1"
+              app:hintTextAppearance="@style/HintGrey"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginEnd="20dp"
+              android:layout_marginLeft="20dp"
+              android:layout_marginRight="20dp"
+              android:layout_marginStart="20dp"
+              app:errorTextAppearance="@style/ErrorStyle"> -->
+
+        <EditText
+            android:id="@+id/editTexto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginStart="20dp"
-            app:errorTextAppearance="@style/ErrorStyle">
+            android:ems="10"
+            android:hint="Nombre del equipo..."
+            android:inputType="textCapWords" />
 
-            <EditText
-                android:id="@+id/editTexto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="Nombre del equipo..."
-                android:textColorHint="@color/black2"
-                android:inputType="textCapWords" />
-
-        </android.support.design.widget.TextInputLayout>
+        <!--  </android.support.design.widget.TextInputLayout> -->
 
         <TextView
             android:id="@+id/escudo_text"
@@ -69,6 +75,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="10dp"
             android:text="Escudo:"
+            android:textColor="@color/colorPrimary"
             android:textStyle="bold" />
 
 
@@ -80,16 +87,15 @@
 
             <ImageView
                 android:id="@+id/escudo_img"
-                android:padding="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="198dp"
-                android:src="@drawable/escudo"
-                android:layout_weight="0.4"/>
+                android:layout_weight="0.4"
+                android:src="@drawable/escudo" />
 
             <LinearLayout
-                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
                 android:layout_weight="0.6"
                 android:orientation="vertical"
                 android:padding="10dp">
