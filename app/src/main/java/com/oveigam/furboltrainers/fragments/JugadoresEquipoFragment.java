@@ -49,6 +49,7 @@ public class JugadoresEquipoFragment extends Fragment implements SwipeRefreshLay
         adapter = new JugadorAdapter(getContext());
 
         equipoID = getActivity().getIntent().getStringExtra("equipoID");
+        setHasOptionsMenu(true);
 
         View rootView = inflater.inflate(R.layout.fragment_con_lista, container, false);
 

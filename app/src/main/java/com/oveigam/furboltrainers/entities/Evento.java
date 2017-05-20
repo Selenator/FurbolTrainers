@@ -1,5 +1,6 @@
 package com.oveigam.furboltrainers.entities;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.Exclude;
 
 import java.util.Date;
@@ -14,17 +15,30 @@ public class Evento {
     String nombreEquipo;
     String imgEquipoURL;
     String comentario;
+    double latitude;
+    double longitude;
 
     public Evento() {
     }
 
-    public Evento(String tipo, Date fecha_hora, String localizacionDescripcion, String nombreEquipo,String imgEquipoURL, String comentario) {
+    public Evento(String tipo, Date fecha_hora, String localizacionDescripcion, LatLng coordenadas, String nombreEquipo,String imgEquipoURL, String comentario) {
         this.tipo = tipo;
         this.fecha_hora = fecha_hora;
         this.localizacionDescripcion = localizacionDescripcion;
+        latitude = coordenadas.latitude;
+        longitude = coordenadas.longitude;
         this.nombreEquipo = nombreEquipo;
         this.imgEquipoURL = imgEquipoURL;
         this.comentario = comentario;
+    }
+
+    public Evento(String tipo, Date fecha_hora, String localizacionDescripcion,LatLng coordenadas, String comentario) {
+        this.tipo = tipo;
+        this.fecha_hora = fecha_hora;
+        this.localizacionDescripcion = localizacionDescripcion;
+        this.comentario = comentario;
+        latitude = coordenadas.latitude;
+        longitude = coordenadas.longitude;
     }
 
     public String getTipo() {
@@ -49,6 +63,26 @@ public class Evento {
 
     public void setLocalizacionDescripcion(String localizacionDescripcion) {
         this.localizacionDescripcion = localizacionDescripcion;
+    }
+
+    public LatLng getCoordenadas() {
+        return new LatLng(latitude,longitude);
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     @Exclude

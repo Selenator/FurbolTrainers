@@ -1,6 +1,7 @@
 package com.oveigam.furboltrainers.activities;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -76,6 +77,7 @@ public class EquipoCrearActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (nombre.getText() != null && !nombre.getText().toString().trim().isEmpty()) {
+                    ProgressDialog.show(EquipoCrearActivity.this, "Creando", "Espera mientras se crea ansioso...");
                     crearEquipo();
                 } else {
                     Snackbar.make(v, "Creo que te olvidas del nombre!", Snackbar.LENGTH_LONG)
@@ -209,5 +211,11 @@ public class EquipoCrearActivity extends AppCompatActivity {
         Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
         parcelFileDescriptor.close();
         return image;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

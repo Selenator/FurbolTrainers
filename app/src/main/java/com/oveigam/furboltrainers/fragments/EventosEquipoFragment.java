@@ -1,10 +1,15 @@
 package com.oveigam.furboltrainers.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -18,6 +23,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.oveigam.furboltrainers.R;
+import com.oveigam.furboltrainers.activities.EquipoCrearActivity;
+import com.oveigam.furboltrainers.activities.EventoCrearActivity;
 import com.oveigam.furboltrainers.adapterslist.EventoAdapter;
 import com.oveigam.furboltrainers.entities.Evento;
 
@@ -38,7 +45,10 @@ public class EventosEquipoFragment extends Fragment implements SwipeRefreshLayou
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         adapter = new EventoAdapter(getContext());
+
+        setHasOptionsMenu(true);
 
         equipoID = getActivity().getIntent().getStringExtra("equipoID");
 
@@ -120,6 +130,42 @@ public class EventosEquipoFragment extends Fragment implements SwipeRefreshLayou
             }
         });
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.eventos_equipo_fragment, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        switch (id){
+            case R.id.nuevo:
+                crearEvento();
+                break;
+            case R.id.editar:
+                System.out.println("DEBUG EDITAR");
+                break;
+            case R.id.eliminar:
+                System.out.println("DEBUG ELIMINAR");
+                break;
+            default:
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void crearEvento() {
+        Intent intent = new Intent(getContext(), EventoCrearActivity.class);
+        intent.putExtra("equipoID", equipoID);
+        startActivity(intent);
     }
 
     @Override
