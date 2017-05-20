@@ -64,10 +64,8 @@ public class EquiposFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
         });
 
-
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh);
         swipeRefreshLayout.setOnRefreshListener(this);
-
 
         return rootView;
     }
