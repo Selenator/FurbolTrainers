@@ -1,7 +1,6 @@
 package com.oveigam.furboltrainers.fragments;
 
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -20,19 +19,16 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.oveigam.furboltrainers.R;
 import com.oveigam.furboltrainers.adapterslist.EventoAdapter;
-import com.oveigam.furboltrainers.entities.Equipo;
 import com.oveigam.furboltrainers.entities.Evento;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Map;
 
 /**
  * Created by Oscarina on 17/04/2017.
  */
 public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
-    String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    String userID;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference();
 
@@ -40,24 +36,35 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     SwipeRefreshLayout swipeRefreshLayout;
     private TextView emptyText;
+    ListView listView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        adapter = new EventoAdapter(getContext());
+        adapter = new EventoAdapter(getContext(), savedInstanceState);
+        userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         View rootView = inflater.inflate(R.layout.fragment_con_lista, container, false);
 
         emptyText = (TextView) rootView.findViewById(R.id.empty);
         emptyText.setVisibility(View.INVISIBLE);
 
-        ListView listView = (ListView) rootView.findViewById(R.id.lista);
+        listView = (ListView) rootView.findViewById(R.id.lista);
         listView.setAdapter(adapter);
         listView.setEmptyView(rootView.findViewById(android.R.id.empty));
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //TODO abrir actividad con detalles del evento
+                EventoAdapter adapter = ((EventoAdapter) listView.getAdapter());
+                if(view.findViewById(R.id.expandible).getVisibility() == View.VISIBLE){
+                    adapter.collpaseItem(view);
+                }else{
+                    adapter.collapseCurrent(listView);
+                    if(adapter.expandItem(position,view)){
+                        listView.setSelection(position);
+                        listView.smoothScrollToPosition(position);
+                    }
+                }
             }
         });
 
@@ -87,6 +94,7 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
         emptyText.setVisibility(View.INVISIBLE);
+        ((EventoAdapter) listView.getAdapter()).collapseCurrent(listView);
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -110,6 +118,7 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                     if (evento != null) {
                                         evento.setNombreEquipo(nombreEquipo);
                                         evento.setImgEquipoURL(imgEquipo);
+                                        evento.setId(id);
                                         adapter.add(evento);
                                     } else {
                                         dataSnapshot.child("equipos").child(entry.getKey()).child("eventos").child(id).getRef().removeValue();

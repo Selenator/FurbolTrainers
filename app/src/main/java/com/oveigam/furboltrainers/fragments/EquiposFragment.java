@@ -32,7 +32,7 @@ import java.util.Map;
  * Created by Oscarina on 17/04/2017.
  */
 public class EquiposFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
-    String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    String userID;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference();
 
@@ -45,6 +45,7 @@ public class EquiposFragment extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         adapter = new EquipoAdapter(getContext(), new ArrayList<Equipo>());
+        userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         View rootView = inflater.inflate(R.layout.fragment_con_lista, container, false);
 

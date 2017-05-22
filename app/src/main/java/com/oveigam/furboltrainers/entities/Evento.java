@@ -9,6 +9,7 @@ import java.util.Date;
  * Created by Oscarina on 19/04/2017.
  */
 public class Evento {
+    String id;
     String tipo;
     Date fecha_hora;
     String localizacionDescripcion;
@@ -65,6 +66,7 @@ public class Evento {
         this.localizacionDescripcion = localizacionDescripcion;
     }
 
+    @Exclude
     public LatLng getCoordenadas() {
         return new LatLng(latitude,longitude);
     }
@@ -101,6 +103,15 @@ public class Evento {
 
     public void setImgEquipoURL(String imgEquipoURL) {
         this.imgEquipoURL = imgEquipoURL;
+    }
+
+    @Exclude
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getComentario() {

@@ -111,7 +111,7 @@ public class EventoCrearActivity extends AppCompatActivity implements OnMapReady
                         tipo = "Partido";
                         break;
                     case R.id.r_otros:
-                        tipo = sitioDesc.getText().toString();
+                        tipo = tipoDesc.getText().toString();
                         if (tipo.isEmpty()) {
                             tipo = "Otros";
                         }

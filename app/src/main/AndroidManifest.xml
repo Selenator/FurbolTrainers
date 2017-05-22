@@ -41,6 +41,7 @@
             android:name=".activities.EventoCrearActivity"
             android:label="@string/title_activity_equipo"
             android:screenOrientation="portrait"/>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA8UuujKXfUpAod4iAnvHP6fEHt6prwBtI"/>
