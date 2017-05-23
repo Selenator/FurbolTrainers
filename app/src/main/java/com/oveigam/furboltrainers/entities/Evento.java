@@ -3,12 +3,13 @@ package com.oveigam.furboltrainers.entities;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.Exclude;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by Oscarina on 19/04/2017.
  */
-public class Evento {
+public class Evento implements Serializable{
     String id;
     String tipo;
     Date fecha_hora;
@@ -18,6 +19,7 @@ public class Evento {
     String comentario;
     double latitude;
     double longitude;
+    boolean editable;
 
     public Evento() {
     }
@@ -36,10 +38,16 @@ public class Evento {
     public Evento(String tipo, Date fecha_hora, String localizacionDescripcion,LatLng coordenadas, String comentario) {
         this.tipo = tipo;
         this.fecha_hora = fecha_hora;
+        fecha_hora.setYear(fecha_hora.getYear()+1900);
         this.localizacionDescripcion = localizacionDescripcion;
         this.comentario = comentario;
-        latitude = coordenadas.latitude;
-        longitude = coordenadas.longitude;
+        if(coordenadas == null){
+            latitude = 0;
+            longitude = 0;
+        }else {
+            latitude = coordenadas.latitude;
+            longitude = coordenadas.longitude;
+        }
     }
 
     public String getTipo() {
@@ -52,6 +60,14 @@ public class Evento {
 
     public Date getFecha_hora() {
         return fecha_hora;
+    }
+
+    @Exclude
+    public Date getFecha_hora_menos1900(){
+        Date d = new Date();
+        d.setTime(fecha_hora.getTime());
+        d.setYear(fecha_hora.getYear()-1900);
+        return d;
     }
 
     public void setFecha_hora(Date fecha_hora) {
@@ -120,5 +136,14 @@ public class Evento {
 
     public void setComentario(String comentario) {
         this.comentario = comentario;
+    }
+
+    @Exclude
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
 }

@@ -2,6 +2,7 @@ package com.oveigam.furboltrainers.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -12,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,6 +23,7 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.oveigam.furboltrainers.R;
 import com.oveigam.furboltrainers.activities.EquipoActivity;
+import com.oveigam.furboltrainers.activities.EquipoCrearActivity;
 import com.oveigam.furboltrainers.adapterslist.EquipoAdapter;
 import com.oveigam.furboltrainers.adapterslist.JugadorAdapter;
 import com.oveigam.furboltrainers.entities.Equipo;
@@ -43,15 +46,34 @@ public class JugadoresEquipoFragment extends Fragment implements SwipeRefreshLay
     private SwipeRefreshLayout swipeRefreshLayout;
     private String equipoID;
     TextView emptyText;
+    private boolean entrenador;
+    private String userID;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         adapter = new JugadorAdapter(getContext());
 
         equipoID = getActivity().getIntent().getStringExtra("equipoID");
+        userID = getActivity().getIntent().getStringExtra("userID");
         setHasOptionsMenu(true);
 
-        View rootView = inflater.inflate(R.layout.fragment_con_lista, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_con_lista, container, false);
+
+        entrenador = false;
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                DataSnapshot jugador = dataSnapshot.child("equipos").child(equipoID).child("jugadores").child(userID);
+                if(jugador.exists())
+                    entrenador = jugador.getValue(boolean.class);
+                cargarBoton(rootView);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
 
         emptyText = (TextView) rootView.findViewById(R.id.empty);
@@ -66,6 +88,21 @@ public class JugadoresEquipoFragment extends Fragment implements SwipeRefreshLay
 
 
         return rootView;
+    }
+
+    private void cargarBoton(View rootView) {
+        //BOTON FLOTANTE DE ABAJO
+        final FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        if(entrenador){
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(getContext(),"PLACE HOLDER",Toast.LENGTH_LONG).show();
+                }
+            });
+        }else{
+            fab.setVisibility(View.GONE);
+        }
     }
 
 

@@ -3,6 +3,8 @@ package com.oveigam.furboltrainers.adapterslist;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,7 +98,7 @@ public class EventoAdapter extends ArrayAdapter<Evento> implements OnMapReadyCal
         Evento e = getItem(position);
         currentPosition = position;
 
-        if((e.getComentario() == null || e.getComentario().isEmpty()) && (e.getLatitude() == 0 && e.getLatitude() == 0)) return false;
+        //if((e.getComentario() == null || e.getComentario().isEmpty()) && (e.getLatitude() == 0 && e.getLatitude() == 0)) return false;
 
         //View view = getViewByPosition(position,listView);
 
@@ -110,7 +112,12 @@ public class EventoAdapter extends ArrayAdapter<Evento> implements OnMapReadyCal
             MapView map = ((MapView)view.findViewById(R.id.mapview));
             map.onResume();
             map.getMapAsync(this);
+
             map.setVisibility(View.VISIBLE);
+        }
+
+        if(e.isEditable()){
+            view.findViewById(R.id.botones_opciones).setVisibility(View.VISIBLE);
         }
 
         LinearLayout expandible = (LinearLayout) view.findViewById(R.id.expandible);
@@ -123,6 +130,7 @@ public class EventoAdapter extends ArrayAdapter<Evento> implements OnMapReadyCal
     public void collpaseItem(View view){
         view.findViewById(R.id.comentario_evento).setVisibility(View.GONE);
         view.findViewById(R.id.mapview).setVisibility(View.GONE);
+        view.findViewById(R.id.botones_opciones).setVisibility(View.GONE);
         view.findViewById(R.id.expandible).setVisibility(View.GONE);
         currentPosition = -1;
     }
@@ -149,8 +157,16 @@ public class EventoAdapter extends ArrayAdapter<Evento> implements OnMapReadyCal
     public void onMapReady(GoogleMap googleMap) {
         Evento e = getItem(currentPosition);
         LatLng coords = e.getCoordenadas();
-        googleMap.addMarker(new MarkerOptions().position(coords).title(e.getLocalizacionDescripcion()));
-
+        googleMap.addMarker(new MarkerOptions().position(coords).title("Más opciones")).showInfoWindow();
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coords, 15));
+        googleMap.getUiSettings().setScrollGesturesEnabled(false);
     }
+
+
+    public boolean isExpanded(){
+        return currentPosition > -1;
+    }
+
+
+
 }

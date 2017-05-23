@@ -74,14 +74,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
 
 
-        //BOTON FLOTANTE DE ABAJO
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getBaseContext(), EquipoCrearActivity.class));
-            }
-        });
 
         //BARRA DE PESTAÑAS
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
@@ -98,11 +90,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if(tab.getPosition()==1){
-                    fab.setVisibility(View.VISIBLE);
-                }else{
-                    fab.setVisibility(View.GONE);
-                }
                 viewPager.setCurrentItem(tab.getPosition());
             }
 

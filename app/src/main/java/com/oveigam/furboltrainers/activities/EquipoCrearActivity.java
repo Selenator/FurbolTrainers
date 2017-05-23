@@ -174,9 +174,11 @@ public class EquipoCrearActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        return super.onOptionsItemSelected(item);
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        if (menuItem.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(menuItem);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
@@ -212,7 +214,6 @@ public class EquipoCrearActivity extends AppCompatActivity {
         parcelFileDescriptor.close();
         return image;
     }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();

@@ -46,9 +46,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Created by Oscarina on 07/05/2017.
+ * Created by Oscarina on 22/05/2017.
  */
-public class EventoCrearActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class EventoEditarActivity extends AppCompatActivity implements OnMapReadyCallback {
     RadioGroup grupoTipo;
     static TextView fecha, hora;
     static int evYear, evMonth, evDay, evHour, evMinute;
@@ -59,7 +59,6 @@ public class EventoCrearActivity extends AppCompatActivity implements OnMapReady
     MapView mapView;
     GoogleMap map;
     Marker marker;
-
 
     EditText sitioDesc;
     private LatLng coordenadas;
@@ -77,18 +76,55 @@ public class EventoCrearActivity extends AppCompatActivity implements OnMapReady
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        equipoID = getIntent().getStringExtra("equipoID");
+        Evento evento = (Evento) getIntent().getSerializableExtra("evento");
+
+        if (evento.getLatitude() != 0 && evento.getLongitude() != 0)
+            coordenadas = evento.getCoordenadas();
 
         mapView = (MapView) findViewById(R.id.mapview);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+//        mapView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                showPlacePickerDialog(v);
+//            }
+//        });
+
+        Date date = evento.getFecha_hora();
+        evYear = date.getYear();
+        evMonth = date.getMonth();
+        evDay = date.getDate();
+        evHour = date.getHours();
+        evMinute = date.getMinutes();
 
         fecha = (TextView) findViewById(R.id.fecha);
+        fecha.setText(SimpleDateFormat.getDateInstance().format(new Date(evYear - 1900, evMonth, evDay)));
         hora = (TextView) findViewById(R.id.hora);
+        hora.setText(SimpleDateFormat.getTimeInstance().format(new Date(1, 1, 1900, evHour, evMinute)));
+
         sitioDesc = (EditText) findViewById(R.id.sitio_desc);
+        sitioDesc.setText(evento.getLocalizacionDescripcion());
         placeCheck = (CheckBox) findViewById(R.id.placeCheck);
+        if(coordenadas!=null){
+            placeCheck.setChecked(true);
+            mapView.setVisibility(View.VISIBLE);
+        }
         final EditText tipoDesc = (EditText) findViewById(R.id.tipo_desc);
         grupoTipo = (RadioGroup) findViewById(R.id.radio_tipo);
+        switch (evento.getTipo()){
+            case "Partido":
+                grupoTipo.check(R.id.r_partido);
+                break;
+            case "Entrenamiento":
+                grupoTipo.check(R.id.r_entrenamiento);
+                break;
+            default:
+                grupoTipo.check(R.id.r_otros);
+                tipoDesc.setText(evento.getTipo());
+                tipoDesc.setVisibility(View.VISIBLE);
+                break;
+        }
         grupoTipo.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
@@ -98,8 +134,10 @@ public class EventoCrearActivity extends AppCompatActivity implements OnMapReady
                     tipoDesc.setVisibility(View.GONE);
             }
         });
+        final String id = evento.getId();
 
         Button crear = (Button) findViewById(R.id.boton_crear);
+        crear.setText("Editar");
         crear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,19 +175,18 @@ public class EventoCrearActivity extends AppCompatActivity implements OnMapReady
 
                 String desc = ((EditText) findViewById(R.id.ev_comentario)).getText().toString();
 
-                Evento evento = new Evento(tipo,eventoDate,ubicacion,coordenadas,desc);
-                crearEvento(evento);
+                Evento evento = new Evento(tipo, eventoDate, ubicacion, coordenadas, desc);
+                editarEvento(evento,id);
 
             }
         });
 
     }
 
-    private void crearEvento(Evento evento) {
-        String key = myRef.child("eventos").push().getKey();
+    private void editarEvento(Evento evento, String key) {
         myRef.child("eventos").child(key).setValue(evento);
-        myRef.child("equipos").child(equipoID).child("eventos").child(key).setValue(true);
-        ProgressDialog.show(EventoCrearActivity.this, "Creando", "Espera un poco ansioso...");
+        //myRef.child("equipos").child(equipoID).child("eventos").child(key).setValue(true);
+        ProgressDialog.show(EventoEditarActivity.this, "Editando", "Espera un poco ansioso...");
         Toast.makeText(getBaseContext(), "EXITO", Toast.LENGTH_LONG).show();
         finish();
     }
@@ -240,12 +277,23 @@ public class EventoCrearActivity extends AppCompatActivity implements OnMapReady
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                showPlacePickerDialog(mapView);
+            }
+        });
 
-        // Add a marker in Sydney, Australia, and move the camera.
-        LatLng sydney = new LatLng(-34, 151);
-        marker = map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        if(coordenadas!=null){
+            marker = map.addMarker(new MarkerOptions().position(coordenadas).title("Más Opciones"));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(coordenadas,15));
+        }else{
+            LatLng sydney = new LatLng(-34, 151);
+            marker = map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
 
-        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+            map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        }
+
     }
 
     public static class DatePickerFragment extends DialogFragment

@@ -2,6 +2,7 @@ package com.oveigam.furboltrainers.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -21,6 +22,7 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.oveigam.furboltrainers.R;
 import com.oveigam.furboltrainers.activities.EquipoActivity;
+import com.oveigam.furboltrainers.activities.EquipoCrearActivity;
 import com.oveigam.furboltrainers.adapterslist.EquipoAdapter;
 import com.oveigam.furboltrainers.entities.Equipo;
 
@@ -52,6 +54,15 @@ public class EquiposFragment extends Fragment implements SwipeRefreshLayout.OnRe
         emptyText = (TextView) rootView.findViewById(R.id.empty);
         emptyText.setVisibility(View.INVISIBLE);
 
+        //BOTON FLOTANTE DE ABAJO
+        final FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getContext(), EquipoCrearActivity.class));
+            }
+        });
+
         final ListView listView = (ListView) rootView.findViewById(R.id.lista);
         listView.setAdapter(adapter);
         listView.setEmptyView(rootView.findViewById(android.R.id.empty));
@@ -61,6 +72,8 @@ public class EquiposFragment extends Fragment implements SwipeRefreshLayout.OnRe
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getContext(), EquipoActivity.class);
                 intent.putExtra("equipoID",adapter.getItem(position).getId());
+                intent.putExtra("equipoNombre",adapter.getItem(position).getNombre());
+                intent.putExtra("userID", userID);
                 startActivity(intent);
             }
         });

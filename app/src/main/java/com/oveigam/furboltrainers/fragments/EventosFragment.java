@@ -1,11 +1,19 @@
 package com.oveigam.furboltrainers.fragments;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -18,10 +26,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.oveigam.furboltrainers.R;
+import com.oveigam.furboltrainers.activities.EquipoCrearActivity;
+import com.oveigam.furboltrainers.activities.EventoCrearActivity;
+import com.oveigam.furboltrainers.activities.EventoEditarActivity;
 import com.oveigam.furboltrainers.adapterslist.EventoAdapter;
 import com.oveigam.furboltrainers.entities.Evento;
 
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -45,6 +57,9 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         View rootView = inflater.inflate(R.layout.fragment_con_lista, container, false);
 
+        //BOTON FLOTANTE DE ABAJO
+        rootView.findViewById(R.id.fab).setVisibility(View.GONE);
+
         emptyText = (TextView) rootView.findViewById(R.id.empty);
         emptyText.setVisibility(View.INVISIBLE);
 
@@ -52,21 +67,46 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
         listView.setAdapter(adapter);
         listView.setEmptyView(rootView.findViewById(android.R.id.empty));
 
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                adapter.collapseCurrent(listView);
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+            }
+        });
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 EventoAdapter adapter = ((EventoAdapter) listView.getAdapter());
                 if(view.findViewById(R.id.expandible).getVisibility() == View.VISIBLE){
                     adapter.collpaseItem(view);
                 }else{
                     adapter.collapseCurrent(listView);
                     if(adapter.expandItem(position,view)){
+                        view.findViewById(R.id.editar_but).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                editarEvento(position);
+                            }
+                        });
+                        view.findViewById(R.id.eliminar_but).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                eliminarEvento(position);
+                            }
+                        });
                         listView.setSelection(position);
                         listView.smoothScrollToPosition(position);
                     }
                 }
             }
         });
+
 
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh);
@@ -79,14 +119,6 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                 }
         );
 
-//        adapter.add(new Evento("Partido", new Date(), "Coliseo", "Osasuna", "Vamos campeones"));
-//        adapter.add(new Evento("Otros", new Date(), "Coliseo", "Osasuna", "Vamos campeones"));
-//        adapter.add(new Evento("Entrenamiento", new Date(), "Coliseo", "Osasuna", "We put the bad in the past now we alright"));
-//        adapter.add(new Evento("Entrenamiento", new Date(), "Coliseo", "Osasuna", "F. F. F. We don't need them, only thing they godd is leaving"));
-//        adapter.add(new Evento("Partido", new Date(), "Coliseo", "Osasuna", "Guala Guala"));
-//        adapter.notifyDataSetChanged();
-
-
         return rootView;
     }
 
@@ -95,6 +127,9 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
         swipeRefreshLayout.setRefreshing(true);
         emptyText.setVisibility(View.INVISIBLE);
         ((EventoAdapter) listView.getAdapter()).collapseCurrent(listView);
+
+        final Date ahoraDate = new Date();
+        ahoraDate.setHours(ahoraDate.getHours() - 3);
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -109,8 +144,10 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     for (Map.Entry<String, Boolean> entry : equiposID.entrySet()) { //se recorren las claves de los equipos y sus valores
                         if (entry.getValue()) {//si el valor es true el jugador esta dentro del equipo y se procede, si no esta pendiente de invitacion
                             //se cogen los id de los eventos y se añaden a una lista(los valores boolean se ingnoran ya que no se usan para nada)
-                            String nombreEquipo = dataSnapshot.child("equipos").child(entry.getKey()).child("nombre").getValue(String.class);
-                            String imgEquipo = dataSnapshot.child("equipos").child(entry.getKey()).child("imgURL").getValue(String.class);
+                            DataSnapshot equipoSnap = dataSnapshot.child("equipos").child(entry.getKey());
+                            String nombreEquipo = equipoSnap.child("nombre").getValue(String.class);
+                            String imgEquipo = equipoSnap.child("imgURL").getValue(String.class);
+                            boolean entrenador = equipoSnap.child("jugadores").child(userID).getValue(boolean.class);
                             Map<String, Boolean> eventosID = dataSnapshot.child("equipos").child(entry.getKey()).child("eventos").getValue(t);
                             if (eventosID != null) {
                                 for (String id : eventosID.keySet()) {
@@ -118,8 +155,13 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                     if (evento != null) {
                                         evento.setNombreEquipo(nombreEquipo);
                                         evento.setImgEquipoURL(imgEquipo);
+                                        evento.setEditable(entrenador);
                                         evento.setId(id);
-                                        adapter.add(evento);
+                                        if(evento.getFecha_hora_menos1900().before(ahoraDate)){ //si el evento esta en el pasado se borra
+                                            dataSnapshot.child("eventos").child(id).getRef().removeValue();
+                                        }else{
+                                            adapter.add(evento);
+                                        }
                                     } else {
                                         dataSnapshot.child("equipos").child(entry.getKey()).child("eventos").child(id).getRef().removeValue();
                                     }
@@ -145,7 +187,46 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+    }
 
 
+    public void editarEvento(int position){
+        Evento e = (Evento) listView.getAdapter().getItem(position);
+        Intent intent = new Intent(getContext(), EventoEditarActivity.class);
+        intent.putExtra("evento",e);
+        startActivity(intent);
+    }
+
+    public void eliminarEvento(int position){
+        final Evento e = (Evento) listView.getAdapter().getItem(position);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        builder.setMessage("Seguro que quieres eliminar?")
+                .setPositiveButton("Si",  new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        eliminar(e);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                })
+                .show();
+    }
+
+    private void eliminar(Evento e) {
+        myRef.child("eventos").child(e.getId()).getRef().removeValue();
+        adapter.remove(e);
+        adapter.notifyDataSetChanged();
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        onRefresh();
     }
 }

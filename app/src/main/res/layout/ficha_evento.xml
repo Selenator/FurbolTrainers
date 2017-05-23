@@ -120,29 +120,59 @@
     </LinearLayout>
 
     <LinearLayout
-        android:descendantFocusability="blocksDescendants"
-        android:visibility="gone"
         android:id="@+id/expandible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:descendantFocusability="blocksDescendants"
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <TextView
-            android:visibility="gone"
-            android:text="waka"
-            android:textAlignment="center"
             android:id="@+id/comentario_evento"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="5dp"/>
+            android:padding="5dp"
+            android:text="waka"
+            android:textAlignment="center"
+            android:visibility="gone" />
 
         <com.google.android.gms.maps.MapView
-            android:visibility="gone"
             android:id="@+id/mapview"
+
             android:layout_width="fill_parent"
             android:layout_height="250dp"
-            android:layout_margin="20dp"
-            android:clickable="true" />
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:clickable="true"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/botones_opciones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/editar_but"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                app:srcCompat="@drawable/ic_edit" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/eliminar_but"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                app:srcCompat="@drawable/ic_delete" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>
