@@ -24,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.oveigam.furboltrainers.R;
 import com.oveigam.furboltrainers.activities.EquipoActivity;
 import com.oveigam.furboltrainers.activities.EquipoCrearActivity;
+import com.oveigam.furboltrainers.activities.InvitarActivity;
 import com.oveigam.furboltrainers.adapterslist.EquipoAdapter;
 import com.oveigam.furboltrainers.adapterslist.JugadorAdapter;
 import com.oveigam.furboltrainers.entities.Equipo;
@@ -97,7 +98,9 @@ public class JugadoresEquipoFragment extends Fragment implements SwipeRefreshLay
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(getContext(),"PLACE HOLDER",Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(getContext(),InvitarActivity.class);
+                    intent.putExtra("equipoID",equipoID);
+                    startActivity(intent);
                 }
             });
         }else{

@@ -47,6 +47,8 @@ public class EquiposFragment extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         adapter = new EquipoAdapter(getContext(), new ArrayList<Equipo>());
+        if(FirebaseAuth.getInstance().getCurrentUser() == null)
+            return inflater.inflate(R.layout.fragment_con_lista, container, false);
         userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         View rootView = inflater.inflate(R.layout.fragment_con_lista, container, false);
@@ -86,6 +88,7 @@ public class EquiposFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     @Override
     public void onRefresh() {
+        if(swipeRefreshLayout == null) return;
         swipeRefreshLayout.setRefreshing(true);
         emptyText.setVisibility(View.INVISIBLE);
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {

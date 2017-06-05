@@ -2,10 +2,14 @@ package com.oveigam.furboltrainers.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -33,6 +37,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.oveigam.furboltrainers.R;
 import com.oveigam.furboltrainers.entities.Jugador;
@@ -42,6 +47,10 @@ import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
 
@@ -59,9 +68,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     DatabaseReference myRef = database.getReference();
     DatabaseReference jugRef;
 
-
-    private Jugador jugadorActivo;
-
+    int invitaciones = 0;
+    String jugadorID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
 
         //BARRA DE PESTAÑAS
@@ -148,18 +155,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivity(intent);
     }
 
-    private void cargarJugador(final FirebaseUser user){
+    private void cargarJugador(final FirebaseUser user) {
         //crea el jugador si no existe
         jugRef = myRef.child("jugadores").child(user.getUid());
         jugRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Jugador jugador = dataSnapshot.getValue(Jugador.class);
-                if(jugador == null){
-                    jugador = new Jugador(user.getDisplayName(), user.getPhotoUrl().toString());
+                if (jugador == null) {
+                    jugador = new Jugador(user.getDisplayName(), user.getPhotoUrl().toString(), user.getEmail());
+                    jugador.setId(dataSnapshot.getKey());
+                    jugador.setEquipos(new HashMap<String, Boolean>());
                     setUserData(jugador);
                     jugRef.setValue(jugador);
-                }else{
+                } else {
+                    jugador.setId(dataSnapshot.getKey());
                     setUserData(jugador);
                 }
             }
@@ -172,21 +182,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setUserData(Jugador jugador) {
+        jugadorID = jugador.getId();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View cabecera = navigationView.getHeaderView(0);
+
+        invitaciones = 0;
+        if (jugador.getEquipos() != null)
+            for (Map.Entry<String, Boolean> entry : jugador.getEquipos().entrySet()) {
+                if (!entry.getValue()) {
+                    invitaciones++;
+                }
+            }
+        if (invitaciones > 0) {
+            navigationView.getMenu().getItem(0).setTitle("Invitaciones (" + invitaciones + ")");
+        } else {
+            navigationView.getMenu().getItem(0).setTitle("Invitaciones");
+        }
 
         TextView titulo = (TextView) cabecera.findViewById(R.id.titulo_cabecera);
         //titulo.setText(user.getDisplayName());
         titulo.setText(jugador.getNombre());
 
-//        TextView mail = (TextView) cabecera.findViewById(R.id.mail_cabecera);
-//        mail.setText(user.getEmail());
+        TextView mail = (TextView) cabecera.findViewById(R.id.mail_cabecera);
+        mail.setText(jugador.getEmail());
 
         ImageView foto = (ImageView) cabecera.findViewById(R.id.imagen_cabecera);
 //        foto.setImageURI(user.getPhotoUrl());
         //Picasso.with(this).load(user.getPhotoUrl()).transform(new CircleTransform()).into(foto);
         Picasso.with(this).load(jugador.getImgURL()).transform(new CircleTransform()).into(foto);
-
 
 
     }
@@ -244,8 +267,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
+        if (id == R.id.invitaciones) {
+            if (invitaciones > 0) {
+                Intent intent = new Intent(getBaseContext(), InvitacionesActivity.class);
+                intent.putExtra("jugadorID", jugadorID);
+                startActivity(intent);
+            } else {
+                Snackbar.make(getCurrentFocus(), "No tienes invitaciones :(", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {

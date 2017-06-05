@@ -38,6 +38,16 @@
             android:label="@string/title_activity_equipo"
             android:screenOrientation="portrait"/>
         <activity
+            android:name=".activities.InvitarActivity"
+            android:label="Buscar Jugadores"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.InvitacionesActivity"
+            android:label="Invitaciones"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
+        <activity
             android:name=".activities.EventoCrearActivity"
             android:label="@string/title_activity_equipo"
             android:screenOrientation="portrait"/>

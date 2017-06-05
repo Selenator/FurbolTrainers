@@ -53,6 +53,8 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         adapter = new EventoAdapter(getContext(), savedInstanceState);
+        if(FirebaseAuth.getInstance().getCurrentUser() == null)
+            return inflater.inflate(R.layout.fragment_con_lista, container, false);
         userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         View rootView = inflater.inflate(R.layout.fragment_con_lista, container, false);
@@ -124,6 +126,7 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     @Override
     public void onRefresh() {
+        if(swipeRefreshLayout == null) return;
         swipeRefreshLayout.setRefreshing(true);
         emptyText.setVisibility(View.INVISIBLE);
         ((EventoAdapter) listView.getAdapter()).collapseCurrent(listView);
@@ -147,7 +150,7 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
                             DataSnapshot equipoSnap = dataSnapshot.child("equipos").child(entry.getKey());
                             String nombreEquipo = equipoSnap.child("nombre").getValue(String.class);
                             String imgEquipo = equipoSnap.child("imgURL").getValue(String.class);
-                            boolean entrenador = equipoSnap.child("jugadores").child(userID).getValue(boolean.class);
+                            //boolean entrenador = equipoSnap.child("jugadores").child(userID).getValue(boolean.class);
                             Map<String, Boolean> eventosID = dataSnapshot.child("equipos").child(entry.getKey()).child("eventos").getValue(t);
                             if (eventosID != null) {
                                 for (String id : eventosID.keySet()) {
@@ -155,7 +158,7 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                     if (evento != null) {
                                         evento.setNombreEquipo(nombreEquipo);
                                         evento.setImgEquipoURL(imgEquipo);
-                                        evento.setEditable(entrenador);
+                                        evento.setEditable(equipoSnap.child("jugadores").child(userID).getValue(boolean.class));
                                         evento.setId(id);
                                         if(evento.getFecha_hora_menos1900().before(ahoraDate)){ //si el evento esta en el pasado se borra
                                             dataSnapshot.child("eventos").child(id).getRef().removeValue();
