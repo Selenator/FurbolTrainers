@@ -3,13 +3,13 @@
 
     <group>
         <item
+            android:id="@+id/perfil"
+            android:icon="@drawable/ic_profile"
+            android:title="Editar Perfil" />
+        <item
             android:id="@+id/invitaciones"
             android:icon="@drawable/inbox"
             android:title="Invitaciones" />
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_slideshow"

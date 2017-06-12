@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -40,6 +41,11 @@
         <activity
             android:name=".activities.InvitarActivity"
             android:label="Buscar Jugadores"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.PerfilEditarActivity"
+            android:label="Editar Perfil"
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait"/>
         <activity

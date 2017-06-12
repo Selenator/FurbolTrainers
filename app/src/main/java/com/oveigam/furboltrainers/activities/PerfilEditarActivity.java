@@ -2,16 +2,17 @@ package com.oveigam.furboltrainers.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -19,30 +20,36 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.oveigam.furboltrainers.R;
+import com.oveigam.furboltrainers.tools.CircleTransform;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.IOException;
 
 /**
- * Created by Oscarina on 23/04/2017.
+ * Created by Oscarina on 12/06/2017.
  */
-public class EquipoCrearActivity extends AppCompatActivity {
-    String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+public class PerfilEditarActivity extends AppCompatActivity {
+    String userID;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference myRef = database.getReference();
+    DatabaseReference myRef;
 
     Button crear, camara, galeria, limpiar;
     EditText nombre;
@@ -52,6 +59,7 @@ public class EquipoCrearActivity extends AppCompatActivity {
     private static final int CAMERA_REQUEST = 1888;
 
     boolean subirIMG;
+    String imgURL;
     Bitmap bitmap;
 
     @Override
@@ -59,10 +67,15 @@ public class EquipoCrearActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_equipo_crear);
 
+        userID = getIntent().getStringExtra("jugadorID");
+
+        myRef = database.getReference().child("jugadores").child(userID);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        ((TextView) findViewById(R.id.escudo_text)).setText("Foto de Perfil:");
 
         crear = (Button) findViewById(R.id.boton_crear);
         camara = (Button) findViewById(R.id.boton_camara);
@@ -74,11 +87,27 @@ public class EquipoCrearActivity extends AppCompatActivity {
 
         escudo = (ImageView) findViewById(R.id.escudo_img);
 
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String nombreUser = dataSnapshot.child("nombre").getValue(String.class);
+                String imgDir = dataSnapshot.child("imgURL").getValue(String.class);
+                mostrarDatos(nombreUser, imgDir);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        crear.setText("Editar");
+
         crear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (nombre.getText() != null && !nombre.getText().toString().trim().isEmpty()) {
-                    ProgressDialog.show(EquipoCrearActivity.this, "Creando", "Espera mientras se crea ansioso...");
+                    ProgressDialog.show(PerfilEditarActivity.this, "Guardando", "Procesar tu careto lleva tiempo...");
                     crearEquipo();
                 } else {
                     Snackbar.make(v, "Creo que te olvidas del nombre!", Snackbar.LENGTH_LONG)
@@ -111,40 +140,49 @@ public class EquipoCrearActivity extends AppCompatActivity {
         limpiar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                escudo.setImageResource(R.drawable.escudo);
+                escudo.setImageResource(R.drawable.ic_profile);
+                bitmap = null;
                 subirIMG = false;
             }
         });
 
+    }
 
+    public void mostrarDatos(String nombre, String img) {
+        imgURL = img;
+        this.nombre.setText(nombre);
+        if (img != null && !img.isEmpty()) {
+            Picasso.with(getBaseContext()).load(img).transform(new CircleTransform()).into(escudo);
+        } else {
+            escudo.setImageResource(R.drawable.ic_profile);
+        }
     }
 
     private void crearEquipo() {
-        final String key = myRef.child("equipos").push().getKey();
-
-
-        if(subirIMG){
-            crearConImagen(key);
+        if (subirIMG) {
+            editarConImagen();
+        } else {
+            editarSinImagen();
         }
-        else{
-            crearSinImagen(key);
-        }
-
 
     }
 
-    private void crearSinImagen(String key) {
-        myRef.child("equipos").child(key).child("nombre").setValue(nombre.getText().toString());
-        myRef.child("equipos").child(key).child("jugadores").child(userID).setValue(true);
-        myRef.child("jugadores").child(userID).child("equipos").child(key).setValue(true);
+    private void editarSinImagen() {
+        StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://furbol-trainers.appspot.com");
+        // Create a reference to the file to delete
+        StorageReference cloudImg = storageRef.child("caretos").child(userID+".png");
+        // Delete the file
+        cloudImg.delete();
+        myRef.child("nombre").setValue(nombre.getText().toString());
+        myRef.child("imgURL").removeValue();
         Toast.makeText(getBaseContext(), "EXITO", Toast.LENGTH_LONG).show();
         finish();
     }
 
-    private void crearConImagen(final String key) {
+    private void editarConImagen() {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReferenceFromUrl("gs://furbol-trainers.appspot.com");
-        StorageReference imagesRef = storageRef.child("escudos").child(key+".png");
+        StorageReference imagesRef = storageRef.child("caretos").child(userID + ".png");
         escudo.setDrawingCacheEnabled(true);
         escudo.buildDrawingCache();
         //Bitmap bitmap = escudo.getDrawingCache();
@@ -157,17 +195,15 @@ public class EquipoCrearActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle unsuccessful uploads
-                Toast.makeText(getBaseContext(),"ALGO SALIO MAL",Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), "ALGO SALIO MAL", Toast.LENGTH_LONG).show();
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                 @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                myRef.child("equipos").child(key).child("nombre").setValue(nombre.getText().toString());
-                myRef.child("equipos").child(key).child("imgURL").setValue(downloadUrl.toString());
-                myRef.child("equipos").child(key).child("jugadores").child(userID).setValue(true);
-                myRef.child("jugadores").child(userID).child("equipos").child(key).setValue(true);
+                myRef.child("nombre").setValue(nombre.getText().toString());
+                myRef.child("imgURL").setValue(downloadUrl.toString());
                 Toast.makeText(getBaseContext(), "EXITO", Toast.LENGTH_LONG).show();
                 finish();
             }
@@ -193,8 +229,9 @@ public class EquipoCrearActivity extends AppCompatActivity {
                         currentUri = resultData.getData();
                         try {
                             bitmap = getBitmapFromUri(currentUri);
-                            escudo.setImageBitmap(bitmap);
-                        } catch (IOException e) {
+                            Picasso.with(getBaseContext()).load(resultData.getData().toString()).transform(new CircleTransform()).into(escudo);
+                            //escudo.setImageBitmap(getBitmapFromUri(currentUri));
+                        } catch (Exception e) {
                             // Handle error here
                         }
                     }
@@ -202,7 +239,8 @@ public class EquipoCrearActivity extends AppCompatActivity {
                 case CAMERA_REQUEST:
                     Bitmap photo = (Bitmap) resultData.getExtras().get("data");
                     bitmap = photo;
-                    escudo.setImageBitmap(photo);
+                    //escudo.setImageBitmap(photo);
+                    Picasso.with(getBaseContext()).load(getImageUri(photo)).transform(new CircleTransform()).into(escudo);
                     break;
             }
         }
@@ -217,6 +255,14 @@ public class EquipoCrearActivity extends AppCompatActivity {
         parcelFileDescriptor.close();
         return image;
     }
+
+    public Uri getImageUri(Bitmap image) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+        String path =  MediaStore.Images.Media.insertImage(getContentResolver(),image,"Careto","El careto");
+        return Uri.parse(path);
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();

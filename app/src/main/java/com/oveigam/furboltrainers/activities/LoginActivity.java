@@ -23,7 +23,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.oveigam.furboltrainers.R;
 
-public class LoginActivity extends AppCompatActivity  implements GoogleApiClient.OnConnectionFailedListener , View.OnClickListener{
+public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
     private static final String TAG = "LOGIN ACTIVITY";
     private static final int RC_SIGN_IN = 9001;
 
@@ -43,6 +43,7 @@ public class LoginActivity extends AppCompatActivity  implements GoogleApiClient
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
+                //.requestIdToken("729432749204-1vo0e2ms704ucn3uejq2gfs1armtkmb9.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
 
@@ -58,7 +59,7 @@ public class LoginActivity extends AppCompatActivity  implements GoogleApiClient
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if(user != null){
+                if (user != null) {
                     goMainScreen();
                 }
             }
@@ -74,14 +75,14 @@ public class LoginActivity extends AppCompatActivity  implements GoogleApiClient
     @Override
     protected void onStop() {
         super.onStop();
-        if(fAuthListener!=null){
+        if (fAuthListener != null) {
             fAuth.removeAuthStateListener(fAuthListener);
         }
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.e(TAG,"ConnectionFailed:\n"+connectionResult.getErrorMessage());
+        Log.e(TAG, "ConnectionFailed:\n" + connectionResult.getErrorMessage());
     }
 
     @Override
@@ -110,7 +111,7 @@ public class LoginActivity extends AppCompatActivity  implements GoogleApiClient
     }
 
     private void goMainScreen() {
-        Intent intent = new Intent(this,MainActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
@@ -119,18 +120,18 @@ public class LoginActivity extends AppCompatActivity  implements GoogleApiClient
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             fireLogIn(result.getSignInAccount());
-        }else{
-            Log.e(TAG,"GoogleSignInResult:\n"+result.getStatus());
+        } else {
+            Log.e(TAG, "GoogleSignInResult:\n" + result.getStatus());
         }
     }
 
     private void fireLogIn(GoogleSignInAccount acct) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(),null);
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         fAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                if(!task.isSuccessful()){
-                    Toast.makeText(getApplicationContext(),"ERROR",Toast.LENGTH_SHORT).show();
+                if (!task.isSuccessful()) {
+                    Toast.makeText(getApplicationContext(), "ERROR", Toast.LENGTH_SHORT).show();
                 }
             }
         });

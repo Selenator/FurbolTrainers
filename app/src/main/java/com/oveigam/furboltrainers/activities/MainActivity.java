@@ -194,9 +194,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         if (invitaciones > 0) {
-            navigationView.getMenu().getItem(0).setTitle("Invitaciones (" + invitaciones + ")");
+            navigationView.getMenu().getItem(1).setTitle("Invitaciones (" + invitaciones + ")");
         } else {
-            navigationView.getMenu().getItem(0).setTitle("Invitaciones");
+            navigationView.getMenu().getItem(1).setTitle("Invitaciones");
         }
 
         TextView titulo = (TextView) cabecera.findViewById(R.id.titulo_cabecera);
@@ -209,9 +209,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ImageView foto = (ImageView) cabecera.findViewById(R.id.imagen_cabecera);
 //        foto.setImageURI(user.getPhotoUrl());
         //Picasso.with(this).load(user.getPhotoUrl()).transform(new CircleTransform()).into(foto);
-        Picasso.with(this).load(jugador.getImgURL()).transform(new CircleTransform()).into(foto);
-
-
+        if(jugador.getImgURL() == null || jugador.getImgURL().isEmpty())
+            foto.setImageResource(R.drawable.balon);
+        else
+            Picasso.with(this).load(jugador.getImgURL()).transform(new CircleTransform()).into(foto);
     }
 
     @Override
@@ -242,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        //getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -251,12 +252,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+//        int id = item.getItemId();
+//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -276,8 +277,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Snackbar.make(getCurrentFocus(), "No tienes invitaciones :(", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-        } else if (id == R.id.nav_gallery) {
-
+        } else if (id == R.id.perfil) {
+            Intent intent = new Intent(getBaseContext(), PerfilEditarActivity.class);
+            intent.putExtra("jugadorID", jugadorID);
+            startActivity(intent);
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
