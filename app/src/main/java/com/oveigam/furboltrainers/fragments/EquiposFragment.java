@@ -75,6 +75,7 @@ public class EquiposFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 Intent intent = new Intent(getContext(), EquipoActivity.class);
                 intent.putExtra("equipoID",adapter.getItem(position).getId());
                 intent.putExtra("equipoNombre",adapter.getItem(position).getNombre());
+                intent.putExtra("imgURL",adapter.getItem(position).getImgURL());
                 intent.putExtra("userID", userID);
                 startActivity(intent);
             }

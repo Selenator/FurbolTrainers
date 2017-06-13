@@ -1,5 +1,6 @@
 package com.oveigam.furboltrainers.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //usuario de firebase
     FirebaseAuth fAuth;
     FirebaseAuth.AuthStateListener fAuthListener;
+    ProgressDialog prog;
 
     //referencias a la base de datos
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -76,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        prog = ProgressDialog.show(MainActivity.this, "Cargando Jugador", "Paciencia, no soy más lento que tu jugando...");
         conectarUsuario();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -213,6 +216,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             foto.setImageResource(R.drawable.balon);
         else
             Picasso.with(this).load(jugador.getImgURL()).transform(new CircleTransform()).into(foto);
+
+        prog.dismiss();
     }
 
     @Override

@@ -44,6 +44,11 @@
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait"/>
         <activity
+            android:name=".activities.EquipoEditarActivity"
+            android:label="Editar Equipo"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
+        <activity
             android:name=".activities.PerfilEditarActivity"
             android:label="Editar Perfil"
             android:theme="@style/AppTheme"
