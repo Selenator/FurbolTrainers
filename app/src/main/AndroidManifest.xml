@@ -49,6 +49,16 @@
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait"/>
         <activity
+            android:name=".activities.BuscarEquipoActivity"
+            android:label="Buscar Equipo"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.PeticionesActivity"
+            android:label="Peticiones"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
+        <activity
             android:name=".activities.PerfilEditarActivity"
             android:label="Editar Perfil"
             android:theme="@style/AppTheme"

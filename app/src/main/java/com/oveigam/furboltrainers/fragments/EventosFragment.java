@@ -129,7 +129,8 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if(swipeRefreshLayout == null) return;
         swipeRefreshLayout.setRefreshing(true);
         emptyText.setVisibility(View.INVISIBLE);
-        ((EventoAdapter) listView.getAdapter()).collapseCurrent(listView);
+        if(!adapter.isEmpty())
+            ((EventoAdapter) listView.getAdapter()).collapseCurrent(listView);
 
         final Date ahoraDate = new Date();
         ahoraDate.setHours(ahoraDate.getHours() - 3);
@@ -182,6 +183,7 @@ public class EventosFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 } else {
                     emptyText.setVisibility(View.VISIBLE);
                 }
+                if(adapter.isEmpty())emptyText.setVisibility(View.VISIBLE);
                 swipeRefreshLayout.setRefreshing(false);
             }
 

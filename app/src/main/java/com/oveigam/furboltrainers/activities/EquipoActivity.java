@@ -33,6 +33,7 @@ public class EquipoActivity extends AppCompatActivity {
     private String equipoID, userID, nombreEquipo, imgURL;
     boolean isTrainer;
     private Menu menu;
+    private boolean ready;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,7 @@ public class EquipoActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists() && dataSnapshot.getValue(boolean.class)) {
                     isTrainer = true;
+                    ready = true;
                     getMenuInflater().inflate(R.menu.menu_equipo, menu);
                 }
             }
@@ -102,6 +104,8 @@ public class EquipoActivity extends AppCompatActivity {
         this.menu = menu;
         if (isTrainer)
             getMenuInflater().inflate(R.menu.menu_equipo, menu);
+        else if(ready)
+            getMenuInflater().inflate(R.menu.menu_equipo_jug, menu);
         return true;
     }
 
@@ -111,9 +115,9 @@ public class EquipoActivity extends AppCompatActivity {
             finish();
         } else if (menuItem.getItemId() == R.id.action_editar) {
             Intent intent = new Intent(getBaseContext(), EquipoEditarActivity.class);
-            intent.putExtra("equipoID",equipoID);
-            intent.putExtra("nombre",nombreEquipo);
-            intent.putExtra("img",imgURL);
+            intent.putExtra("equipoID", equipoID);
+            intent.putExtra("nombre", nombreEquipo);
+            intent.putExtra("img", imgURL);
             startActivity(intent);
             finish();
         } else if (menuItem.getItemId() == R.id.action_eliminar) {
@@ -134,15 +138,34 @@ public class EquipoActivity extends AppCompatActivity {
                         }
                     })
                     .show();
+        } else if (menuItem.getItemId() == R.id.action_dejar) {
+            abandonar();
         }
 
         return super.onOptionsItemSelected(menuItem);
     }
 
+    private void abandonar() {
+        final DatabaseReference ref = database.getReference();
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                dataSnapshot.child("equipos").child(equipoID).child("jugadores").child(userID).getRef().removeValue();
+                dataSnapshot.child("jugadores").child(userID).child("equipos").child(equipoID).getRef().removeValue();
+                finish();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     private void eliminarEquipo() {
         StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://furbol-trainers.appspot.com");
         // Create a reference to the file to delete
-        StorageReference cloudImg = storageRef.child("escudos").child(equipoID+".png");
+        StorageReference cloudImg = storageRef.child("escudos").child(equipoID + ".png");
         // Delete the file
         cloudImg.delete();
 

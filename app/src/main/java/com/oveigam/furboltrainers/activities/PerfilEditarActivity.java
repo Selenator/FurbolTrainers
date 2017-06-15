@@ -1,5 +1,6 @@
 package com.oveigam.furboltrainers.activities;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -13,6 +14,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -66,6 +68,8 @@ public class PerfilEditarActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_equipo_crear);
+
+        pedirPermisos(findViewById(android.R.id.content));
 
         userID = getIntent().getStringExtra("jugadorID");
 
@@ -269,5 +273,19 @@ public class PerfilEditarActivity extends AppCompatActivity {
         finish();
     }
 
-
+    public void pedirPermisos(View v){
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            Snackbar.make(v, "Necesito gestionar imagenes subidas",
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction("ok", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ActivityCompat.requestPermissions(PerfilEditarActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},10);
+                        }
+                    })
+                    .show();
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 10);
+        }
+    }
 }

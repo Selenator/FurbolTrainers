@@ -66,8 +66,8 @@ public class EventosEquipoFragment extends Fragment implements SwipeRefreshLayou
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-               DataSnapshot jugador = dataSnapshot.child("equipos").child(equipoID).child("jugadores").child(userID);
-                if(jugador.exists())
+                DataSnapshot jugador = dataSnapshot.child("equipos").child(equipoID).child("jugadores").child(userID);
+                if (jugador.exists())
                     entrenador = jugador.getValue(boolean.class);
                 cargarBoton(rootView);
             }
@@ -77,7 +77,6 @@ public class EventosEquipoFragment extends Fragment implements SwipeRefreshLayou
 
             }
         });
-
 
 
         emptyText = (TextView) rootView.findViewById(R.id.empty);
@@ -144,14 +143,14 @@ public class EventosEquipoFragment extends Fragment implements SwipeRefreshLayou
     private void cargarBoton(View rootView) {
         //BOTON FLOTANTE DE ABAJO
         final FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
-        if(entrenador){
+        if (entrenador) {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     crearEvento();
                 }
             });
-        }else{
+        } else {
             fab.setVisibility(View.GONE);
         }
     }
@@ -160,7 +159,8 @@ public class EventosEquipoFragment extends Fragment implements SwipeRefreshLayou
     @Override
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
-        ((EventoAdapter) listView.getAdapter()).collapseCurrent(listView);
+        if (!adapter.isEmpty())
+            ((EventoAdapter) listView.getAdapter()).collapseCurrent(listView);
         emptyText.setVisibility(View.INVISIBLE);
 
         final Date ahoraDate = new Date();

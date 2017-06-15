@@ -33,6 +33,7 @@ public class JugadorAdapter extends ArrayAdapter<Jugador> {
 
         Jugador jugador = getItem(position);
 
+
         TextView nombre = (TextView) convertView.findViewById(R.id.nombre_equipo);
         nombre.setText(jugador.getNombre());
 
@@ -42,6 +43,12 @@ public class JugadorAdapter extends ArrayAdapter<Jugador> {
         } else {
             escudo.setImageResource(R.drawable.balon);
         }
+
+
+        if(jugador.isEntrenador())
+            convertView.findViewById(R.id.silbato).setVisibility(View.VISIBLE);
+        else
+            convertView.findViewById(R.id.silbato).setVisibility(View.GONE);
 
         return convertView;
     }

@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.oveigam.furboltrainers.activities.EquipoActivity">
+    <item
+        android:id="@+id/action_dejar"
+        android:title="Dejar Equipo"
+        app:showAsAction="never" />
+</menu>

@@ -19,22 +19,26 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.oveigam.furboltrainers.R;
-import com.oveigam.furboltrainers.adapterslist.JugadorAdapter;
-import com.oveigam.furboltrainers.entities.Jugador;
+import com.oveigam.furboltrainers.adapterslist.EquipoAdapter;
+import com.oveigam.furboltrainers.entities.Equipo;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
- * Created by Oscarina on 03/06/2017.
+ * Created by Oscarina on 13/06/2017.
  */
-public class InvitarActivity extends AppCompatActivity {
+public class BuscarEquipoActivity extends AppCompatActivity {
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference();
 
-    String equipoID;
-    private JugadorAdapter adapter;
+    String userID;
+    private EquipoAdapter adapter;
     EditText editBuscar;
 
     @Override
@@ -46,7 +50,9 @@ public class InvitarActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        adapter = new JugadorAdapter(getBaseContext());
+        userID = getIntent().getStringExtra("jugadorID");
+
+        adapter = new EquipoAdapter(getBaseContext(),new ArrayList<Equipo>());
         ListView listView = (ListView) findViewById(R.id.lista);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -55,9 +61,6 @@ public class InvitarActivity extends AppCompatActivity {
                 confirmarInvi(position);
             }
         });
-
-
-        equipoID = getIntent().getStringExtra("equipoID");
 
         editBuscar = (EditText) findViewById(R.id.edit_buscar);
 
@@ -73,15 +76,20 @@ public class InvitarActivity extends AppCompatActivity {
         });
     }
 
+    private void cargarSpinner(ArrayList<String> equiposKeys) {
+
+    }
+
+
     public void confirmarInvi(int position){
-        final Jugador jugador = adapter.getItem(position);
+        final Equipo equipo = adapter.getItem(position);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setMessage("Invitar a " + jugador.getNombre() + " ?")
+        builder.setMessage("Pedir acceso a " + equipo.getNombre() + " ?")
                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        invitar(jugador);
+                        pedir(equipo);
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -93,32 +101,30 @@ public class InvitarActivity extends AppCompatActivity {
                 .show();
     }
 
-    public void invitar(Jugador jugador) {
+    public void pedir(Equipo equipo) {
         //myRef.child("equipos").child(equipoID).child(jugador.getId()).setValue(false);
-        myRef.child("jugadores").child(jugador.getId()).child("equipos").child(equipoID).setValue(false);
-        Toast.makeText(getBaseContext(), "Invitación enviada", Toast.LENGTH_LONG).show();
-        adapter.remove(jugador);
-        adapter.notifyDataSetChanged();
+            myRef.child("equipos").child(equipo.getId()).child("peticiones").child(userID).setValue(true);
+        Toast.makeText(getBaseContext(), "Petición enviada", Toast.LENGTH_LONG).show();
     }
 
     public void buscar() {
         String busqueda = editBuscar.getText().toString();
-        String buscarPor = busqueda.contains("@") ? "email" : "nombre";
+        String buscarPor = "nombre";
         adapter.clear();
 
         //Query query = myRef.child("jugadores").orderByChild(buscarPor).equalTo(busqueda);
 
-        Query query = myRef.child("jugadores").orderByChild(buscarPor).startAt(busqueda).endAt(busqueda + "\uf8ff");
-        query.addValueEventListener(new ValueEventListener() {
+        Query query = myRef.child("equipos").orderByChild(buscarPor).startAt(busqueda).endAt(busqueda + "\uf8ff");
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        if (snapshot.child("equipos").child(equipoID).exists())
+                        if(snapshot.child("jugadores").child(userID).exists())
                             continue;
-                        Jugador j = snapshot.getValue(Jugador.class);
-                        j.setId(snapshot.getKey());
-                        adapter.add(j);
+                        Equipo e = snapshot.getValue(Equipo.class);
+                        e.setId(snapshot.getKey());
+                        adapter.add(e);
                     }
                     adapter.notifyDataSetChanged();
                 } else {

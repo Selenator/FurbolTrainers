@@ -1,7 +1,10 @@
 package com.oveigam.furboltrainers.activities;
 
+import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -14,6 +17,8 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
@@ -27,6 +32,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -78,7 +84,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        prog = ProgressDialog.show(MainActivity.this, "Cargando Jugador", "Paciencia, no soy más lento que tu jugando...");
+        //goLogin();
+
+        //prog = ProgressDialog.show(MainActivity.this, "Cargando Jugador", "Paciencia, no soy más lento que tu jugando...");
+
+        //la lie un poco con las credenciales en la consola de firebase, esto mete un boton para forzar el deslogueo
+        prog = new ProgressDialog(MainActivity.this);
+        prog.setTitle("Cargando Usuario");
+        prog.setMessage("Paciencia, no soy más lento que tu jugando...");
+        prog.setCancelable(false);
+        prog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancelar: Ir a login", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                FirebaseAuth.getInstance().signOut();
+            }
+        });
+        prog.show();
+
         conectarUsuario();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -113,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             }
         });
-
 
         //CAJON LATERAL
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -212,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ImageView foto = (ImageView) cabecera.findViewById(R.id.imagen_cabecera);
 //        foto.setImageURI(user.getPhotoUrl());
         //Picasso.with(this).load(user.getPhotoUrl()).transform(new CircleTransform()).into(foto);
-        if(jugador.getImgURL() == null || jugador.getImgURL().isEmpty())
+        if (jugador.getImgURL() == null || jugador.getImgURL().isEmpty())
             foto.setImageResource(R.drawable.balon);
         else
             Picasso.with(this).load(jugador.getImgURL()).transform(new CircleTransform()).into(foto);
@@ -286,13 +307,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Intent intent = new Intent(getBaseContext(), PerfilEditarActivity.class);
             intent.putExtra("jugadorID", jugadorID);
             startActivity(intent);
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
+        } else if (id == R.id.buscarequipo) {
+            Intent intent = new Intent(getBaseContext(), BuscarEquipoActivity.class);
+            intent.putExtra("jugadorID", jugadorID);
+            startActivity(intent);
+        } else if (id == R.id.peticiones) {
+            Intent intent = new Intent(getBaseContext(), PeticionesActivity.class);
+            intent.putExtra("jugadorID", jugadorID);
+            startActivity(intent);
+        }else if (id == R.id.ayuda) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://sites.google.com/view/furboltrainers/instrucciones-de-uso"));
+            startActivity(browserIntent);
         } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+            Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+            sharingIntent.setType("text/plain");
+            String shareBody = "Aún no has probado la app con el desarrollador mas sexy del momento? Hágale pues, FÚRBOL TRAINERS - https://goo.gl/h4vboi";
+            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Fúrbol Trainers");
+            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+            startActivity(Intent.createChooser(sharingIntent, "Share via"));
+        } else if (id == R.id.logout) {
             FirebaseAuth.getInstance().signOut();
             goLogin();
         }
@@ -306,4 +339,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.e(TAG, "Connection Failed:\n" + connectionResult.getErrorMessage());
     }
+
 }
